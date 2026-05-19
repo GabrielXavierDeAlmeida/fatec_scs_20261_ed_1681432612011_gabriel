@@ -1,0 +1,158 @@
+#/-----------------------------------------------------------------------------------------/
+#/*                         FATEC-São Caetano do Sul                                        */
+#/*                         Estrutura de Dados                                              */
+#/*                         Id da Atividade: B2-3                                           */
+#/*                 Objetivo: Árvores Binárias e como percorrer e analisar                  */
+#/*                     Autor: GABRIEL XAVIER DE ALMEIDA                                    */
+#/*                            Data:04/05/2026                                              */
+#/-----------------------------------------------------------------------------------------/
+
+from collections import deque
+
+class No:
+    def __init__(self, valor):
+        self.valor = valor
+        self.esq = None
+        self.dir = None
+
+class ArvoreBST:
+    def __init__(self, raiz=None):
+        self.raiz = raiz
+
+    def analisar_arvore(self):
+        print("--- Analise da árvore ---")
+        print(f"Raiz: {self.raiz.valor}")
+
+        print("\nNós Internos:")
+        self.imprimir_nos_internos()
+
+        print("\nNós Folhas:")
+        self.imprimir_folhas()
+
+        print("\nNíveis:")
+        self.imprimir_niveis()
+
+        print("\n--- Nó por nó ---")
+        def percorrer(no):
+            if no is None:
+                return
+
+            grau = 0
+            if no.esq is not None:
+                grau += 1
+            if no.dir is not None:
+                grau += 1
+
+            print(f"\n|- Nó {no.valor} -|")
+            print(f"Grau: {grau}")
+            print(f"Altura: {self.calcular_altura(no)}")
+            print(f"Profundidade: {self.calcular_profundidade(no.valor)}")
+            self.imprimir_ancestrais(no.valor)
+            self.imprimir_descendentes(no.valor)
+
+            percorrer(no.esq)
+            percorrer(no.dir)
+
+        percorrer(self.raiz)
+
+    def imprimir_nos_internos(self):
+        def percorrer(no):
+            if no is None:
+                return
+            if no.esq is not None or no.dir is not None:
+                print(no.valor)
+            percorrer(no.esq)
+            percorrer(no.dir)
+
+        percorrer(self.raiz)
+
+    def imprimir_folhas(self):
+        def percorrer(no):
+            if no is None:
+                return
+            if no.esq is None and no.dir is None:
+                print(no.valor)
+            percorrer(no.esq)
+            percorrer(no.dir)
+
+        percorrer(self.raiz)
+
+    def imprimir_niveis(self):
+        if self.raiz is None:
+            return
+
+        fila = deque()
+        fila.append((self.raiz, 0))
+
+        while len(fila) > 0:
+            no, nivel = fila.popleft()
+            print(f"Nível {nivel}: {no.valor}")
+
+            if no.esq is not None:
+                fila.append((no.esq, nivel + 1))
+            if no.dir is not None:
+                fila.append((no.dir, nivel + 1))
+
+    def calcular_altura(self, no):
+        if no is None:
+            return -1
+
+        altura_esq = self.calcular_altura(no.esq)
+        altura_dir = self.calcular_altura(no.dir)
+
+        return 1 + max(altura_esq, altura_dir)
+
+    def calcular_profundidade(self, valor):
+        profundidade = 0
+        atual = self.raiz
+
+        while atual is not None:
+            if valor == atual.valor:
+                return profundidade
+            elif valor < atual.valor:
+                atual = atual.esq
+                profundidade += 1
+            else:
+                atual = atual.dir
+                profundidade += 1
+
+        return -1
+
+    def imprimir_ancestrais(self, valor):
+        ancestrais = []
+        atual = self.raiz
+
+        while atual is not None:
+            if valor == atual.valor:
+                print(f"Ancestrais de {valor}: {ancestrais}")
+                return
+            elif valor < atual.valor:
+                ancestrais.append(atual.valor)
+                atual = atual.esq
+            else:
+                ancestrais.append(atual.valor)
+                atual = atual.dir
+
+        print(f"Valor {valor} não encontrado.")
+
+    def imprimir_descendentes(self, valor):
+        def percorrer(no):
+            if no is None:
+                return
+            print(no.valor)
+            percorrer(no.esq)
+            percorrer(no.dir)
+
+        atual = self.raiz
+        while atual is not None:
+            if valor == atual.valor:
+                print(f"Descendentes de {valor}:\n", end="")
+                percorrer(atual.esq)
+                percorrer(atual.dir)
+                return
+            elif valor < atual.valor:
+                atual = atual.esq
+            else:
+                atual = atual.dir
+
+        print(f"Valor {valor} não encontrado.")
